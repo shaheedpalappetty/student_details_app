@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:getx_student_app/const/colors/colors.dart';
 import 'package:get/get.dart';
+import 'package:getx_student_app/controllers/student_controller.dart';
 import 'package:getx_student_app/views/add_student_screen.dart';
 import 'package:getx_student_app/views/student_details.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
+  HomePage({super.key});
+  final StudentController studentController = Get.put(StudentController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,41 +90,49 @@ class HomePage extends StatelessWidget {
             const SizedBox(
               height: 15,
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: 5,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-              ),
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    color: Colors.grey.shade900,
+            Obx(
+              () {
+                if (studentController.isLoading.value) {
+                  return const Text("Nothing To Display");
+                }
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: studentController.studentList.length,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
                   ),
-                  child: ListTile(
-                    onTap: () {
-                      Get.to(() => const StudentDetails());
-                    },
-                    minVerticalPadding: 25,
-                    leading: const CircleAvatar(
-                      radius: 25,
-                      backgroundColor: Color.fromARGB(255, 30, 215, 96),
-                      // child: Text('${index + 1}'.toString()),
-                      // backgroundImage:
-                      // FileImage(File(item.value.studentProfile!)),
-                    ),
-                    title: const Text(
-                      'Shaheed',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    trailing: const Icon(
-                      Icons.arrow_forward_ios_sharp,
-                      size: 14,
-                    ),
-                  ),
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final student = studentController.studentList[index];
+                    return Container(
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: Colors.grey.shade900,
+                      ),
+                      child: ListTile(
+                        onTap: () {
+                          Get.to(() => const StudentDetails());
+                        },
+                        minVerticalPadding: 25,
+                        leading: const CircleAvatar(
+                          radius: 25,
+                          backgroundColor: Color.fromARGB(255, 30, 215, 96),
+                          // child: Text('${index + 1}'.toString()),
+                          // backgroundImage:
+                          // FileImage(File(item.value.studentProfile!)),
+                        ),
+                        title: Text(
+                          student.name,
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios_sharp,
+                          size: 14,
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             )

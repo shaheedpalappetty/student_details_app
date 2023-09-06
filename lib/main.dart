@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         hintColor: CustomColors.primaryColor,
         scaffoldBackgroundColor: Colors.black,
       ),
-      home: const HomePage(),
+      home:  HomePage(),
     );
   }
 }
