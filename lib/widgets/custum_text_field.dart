@@ -27,6 +27,7 @@ class CustomTextField extends StatelessWidget {
         color: Colors.black,
       )),
       child: TextFormField(
+        
         controller: inputController,
         keyboardType: inputType,
         onChanged: onChanged,

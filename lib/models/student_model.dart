@@ -1,10 +1,10 @@
 class StudentModel {
   final int? id;
-  final String name;
-  final int age;
-  final String batch;
-  final int regnum;
-  final String image;
+   String name;
+   int age;
+   String batch;
+   int regnum;
+   String image;
 
   StudentModel(
       {this.id,

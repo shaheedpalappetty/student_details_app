@@ -21,25 +21,19 @@ class StudentApi {
     }
   }
 
-  static Future<void> addStudent(StudentModel student) async {
-    print(student);
+  static Future<bool> addStudent(StudentModel student) async {
     const url = 'http://10.0.2.2:8080/adduser';
     final uri = Uri.parse(url);
     final user = student.toJson();
     final body = jsonEncode(user);
-    print(body);
+
     final response = await client.post(uri, body: body, headers: {
       'Content-Type': 'application/json',
     });
-    if (response.statusCode == 200) {
-      print('Added New User');
-    } else {
-      print(response.body);
-      print('Adding Student details Failed');
-    }
+    return response.statusCode == 200;
   }
 
-  static Future<void> updateStudentDetails(StudentModel student) async {
+  static Future<bool> updateStudentDetails(StudentModel student) async {
     int id = student.id!;
     final url = 'http://10.0.2.2:8080/updateuser/$id';
     final uri = Uri.parse(url);
@@ -47,24 +41,28 @@ class StudentApi {
     final body = jsonEncode(user);
     final response = await client
         .put(uri, body: body, headers: {'Content-Type': 'application/json'});
-    if (response.statusCode == 200) {
-      print('Added New User');
-    } else {
-      print('Response:${response.body}');
-      print('Adding Student details Failed');
-    }
+    return response.statusCode == 200;
   }
 
-  static Future<void> deleteStudent(int id) async {
+  static Future<bool> deleteStudent(int id) async {
     final url = 'http://10.0.2.2:8080/deleteuser/$id';
     final uri = Uri.parse(url);
 
     final response = await client.delete(uri);
+    return response.statusCode == 200;
+  }
+
+  static Future<List<StudentModel>> searchStudents(String name) async {
+    final url = 'http://10.0.2.2:8080/searchuser/$name';
+    final uri = Uri.parse(url);
+    final response = await client.get(uri);
     if (response.statusCode == 200) {
-      print('Added New User');
+      final body = jsonDecode(response.body);
+      final result = body['users'] as List<dynamic>;
+      final studentlist = result.map((e) => StudentModel.fromJson(e)).toList();
+      return studentlist;
     } else {
-      print('Response:${response.body}');
-      print('Adding Student details Failed');
+      return [];
     }
   }
 }

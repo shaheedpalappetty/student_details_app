@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:getx_student_app/const/colors/colors.dart';
 import 'package:get/get.dart';
 import 'package:getx_student_app/controllers/student_controller.dart';
+import 'package:getx_student_app/services/api_services.dart';
 import 'package:getx_student_app/views/add_student_screen.dart';
 import 'package:getx_student_app/views/student_details.dart';
 
@@ -39,69 +42,76 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 15,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  color: Colors.white,
-                ),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.search,
-                        color: Colors.black,
-                        size: 24,
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                          child: SizedBox(
-                        height: 50,
-                        child: TextFormField(
-                          onChanged: (value) {},
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          decoration: const InputDecoration(
-                              hintText: 'Search Students',
-                              hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.w600),
-                              focusedBorder: InputBorder.none),
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 15,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                color: Colors.white,
+              ),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.search,
+                      color: Colors.black,
+                      size: 24,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                        child: SizedBox(
+                      height: 50,
+                      child: TextFormField(
+                        onChanged: (value) async {
+                          final result = await StudentApi.searchStudents(value);
+                          print(result);
+                          // debounce(listener, (callback) => null);
+                        },
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w600,
                         ),
-                      )),
-                    ],
-                  ),
+                        decoration: const InputDecoration(
+                            hintText: 'Search Students',
+                            hintStyle: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w600),
+                            focusedBorder: InputBorder.none),
+                      ),
+                    )),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(
-              height: 15,
-            ),
-            Obx(
-              () {
-                if (studentController.isLoading.value) {
-                  return const Text("Nothing To Display");
-                }
-                return ListView.builder(
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          GetBuilder<StudentController>(
+            initState: (state) async {
+              studentController.fetchStudents();
+            },
+            builder: (controller) {
+              if (studentController.studentList.isEmpty) {
+                return const Text("Nothing To Display");
+              }
+              return Expanded(
+                child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: studentController.studentList.length,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                   ),
-                  physics: const NeverScrollableScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   itemBuilder: (context, index) {
                     final student = studentController.studentList[index];
                     return Container(
@@ -112,18 +122,17 @@ class HomePage extends StatelessWidget {
                       ),
                       child: ListTile(
                         onTap: () {
-                          Get.to(() => const StudentDetails());
+                          Get.to(() => StudentDetails(
+                                index: index,
+                              ));
                         },
                         minVerticalPadding: 25,
-                        leading: const CircleAvatar(
+                        leading: CircleAvatar(
                           radius: 25,
-                          backgroundColor: Color.fromARGB(255, 30, 215, 96),
-                          // child: Text('${index + 1}'.toString()),
-                          // backgroundImage:
-                          // FileImage(File(item.value.studentProfile!)),
+                          backgroundImage: FileImage(File(student.value.image)),
                         ),
                         title: Text(
-                          student.name,
+                          student.value.name,
                           style: const TextStyle(fontSize: 18),
                         ),
                         trailing: const Icon(
@@ -133,11 +142,11 @@ class HomePage extends StatelessWidget {
                       ),
                     );
                   },
-                );
-              },
-            )
-          ],
-        ),
+                ),
+              );
+            },
+          )
+        ],
       ),
     );
   }
