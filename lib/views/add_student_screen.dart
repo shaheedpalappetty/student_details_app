@@ -1,13 +1,21 @@
 // ignore_for_file: dead_code
 
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:getx_student_app/const/colors/colors.dart';
+import 'package:getx_student_app/controllers/image_controller.dart';
+import 'package:getx_student_app/controllers/student_controllers.dart';
+import 'package:getx_student_app/model/student_model.dart';
 import 'package:getx_student_app/widgets/card_item.dart';
 import 'package:getx_student_app/widgets/custum_text_field.dart';
+import 'package:image_picker/image_picker.dart';
 
-class AddStudent extends StatelessWidget {
-  AddStudent({super.key});
+class AddStudent extends ConsumerWidget {
+  final bool isEdit;
+  final int? index;
+  final StudentModel? student;
+  AddStudent({super.key, this.isEdit = false, this.student, this.index});
 
   final TextEditingController studentname = TextEditingController();
 
@@ -16,18 +24,29 @@ class AddStudent extends StatelessWidget {
   final TextEditingController studentRegNum = TextEditingController();
 
   final TextEditingController studentAge = TextEditingController();
+  bool imageCheck = false;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final img = ref.watch(image);
+    if (isEdit) {
+      imageCheck = true;
+      studentname.text = student!.name;
+      studentBatch.text = student!.batch;
+      studentRegNum.text = student!.regnum;
+
+      studentAge.text = student!.age;
+    }
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: IconButton(
             onPressed: () {
-              Get.back();
+              Navigator.of(context).pop();
             },
             icon: const Icon(Icons.arrow_back)),
-        title: const Text('Add Student'),
+        title: Text(isEdit ? 'Edit Details' : 'Add Student'),
         centerTitle: true,
         elevation: 0,
       ),
@@ -59,34 +78,46 @@ class AddStudent extends StatelessWidget {
                           children: [
                             Stack(
                               children: [
-                                Container(
-                                  width: 130,
-                                  height: 130,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4),
-                                    color: Colors.grey.shade700,
-                                  ),
-                                  child: Center(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.drive_folder_upload_outlined,
-                                          size: 20,
-                                          color: Colors.grey.shade100,
+                                imageCheck
+                                    ? Container(
+                                        height: 130,
+                                        width: 130,
+                                        decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                                image: FileImage(File(isEdit
+                                                    ? student!.image
+                                                    : img)))),
+                                      )
+                                    : Container(
+                                        width: 130,
+                                        height: 130,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          color: Colors.grey.shade700,
                                         ),
-                                        const SizedBox(height: 10),
-                                        const Text(
-                                          'Select\nprofile image',
-                                          textAlign: TextAlign.center,
+                                        child: Center(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons
+                                                    .drive_folder_upload_outlined,
+                                                size: 20,
+                                                color: Colors.grey.shade100,
+                                              ),
+                                              const SizedBox(height: 10),
+                                              const Text(
+                                                'Select\nprofile image',
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                                      ),
                                 Positioned(
                                   bottom: 10,
                                   right: 10,
@@ -95,6 +126,7 @@ class AddStudent extends StatelessWidget {
                                     child: GestureDetector(
                                       onTap: () {
                                         //Select an Image
+                                        imagePick(ref);
                                       },
                                       child: const Row(
                                         children: [
@@ -120,22 +152,16 @@ class AddStudent extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CardItemWidget(
-                              // cardController: cardController,
                               title: 'AGE',
-                              value: '32',
-                              // value:'${cardController.studentAge.value}'
+                              value: '',
                             ),
                             CardItemWidget(
-                              // cardController: cardController,
                               title: 'BATCH',
-                              value: 'BCK104',
-                              // value: '${cardController.studentBatch.value}'
+                              value: '',
                             ),
                             CardItemWidget(
-                              // cardController: cardController,
                               title: 'REG. NUMBER',
-                              value: '126025',
-                              // value: '${cardController.studentRegNum.value}'
+                              value: '',
                             ),
                           ],
                         )
@@ -161,8 +187,7 @@ class AddStudent extends StatelessWidget {
                           height: 10,
                         ),
                         Text(
-                          'Shaheed Palappetty',
-                          // '${cardController.studentName.value}',
+                          '',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -182,36 +207,28 @@ class AddStudent extends StatelessWidget {
               hintText: 'Full Name',
               inputController: studentname,
               inputType: TextInputType.name,
-              onChanged: (value) {
-                // cardController.updateName(value);
-              },
+              onChanged: (value) {},
             ),
             CustomTextField(
               hintText: 'Age',
               inputController: studentAge,
               inputType: TextInputType.number,
               maxLength: 2,
-              onChanged: (value) {
-                // cardController.updateAge(value);
-              },
+              onChanged: (value) {},
             ),
             CustomTextField(
               hintText: 'Batch',
               inputController: studentBatch,
               inputType: TextInputType.number,
               maxLength: 4,
-              onChanged: (value) {
-                //   cardController.updateBatch(value);
-              },
+              onChanged: (value) {},
             ),
             CustomTextField(
               hintText: 'Register Number',
               inputController: studentRegNum,
               inputType: TextInputType.number,
               maxLength: 8,
-              onChanged: (value) {
-                // cardController.updateRegNum(value);
-              },
+              onChanged: (value) {},
             ),
             Container(
               width: double.maxFinite,
@@ -222,11 +239,13 @@ class AddStudent extends StatelessWidget {
                     backgroundColor: MaterialStatePropertyAll(
                         CustomColors.primaryColor.shade500)),
                 onPressed: () {
-                  // addStudent();
+                  isEdit
+                      ? updateStudent(img, ref, index!, context)
+                      : addStudent(img, ref, context);
                 },
-                child: const Text(
-                  'Save',
-                  style: TextStyle(
+                child: Text(
+                  isEdit ? 'Update' : 'Save',
+                  style: const TextStyle(
                     fontSize: 18,
                   ),
                 ),
@@ -236,5 +255,92 @@ class AddStudent extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  imagePick(WidgetRef ref) async {
+    final imagePath =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (imagePath != null) {
+      ref.read(image.notifier).state = imagePath.path;
+      imageCheck = true;
+    }
+  }
+
+  addStudent(String img, WidgetRef ref, BuildContext context) {
+    final name = studentname.text.trim();
+    final age = studentAge.text.trim();
+    final batch = studentBatch.text.trim();
+    final regnum = studentRegNum.text.trim();
+    if (name.isNotEmpty &&
+        age.isNotEmpty &&
+        batch.isNotEmpty &&
+        regnum.isNotEmpty &&
+        img != '') {
+      final user = StudentModel(
+        name: name,
+        age: age,
+        batch: batch,
+        regnum: regnum,
+        image: img,
+      );
+      ref.read(studentProvider.notifier).addStudent(user);
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: Color.fromARGB(255, 255, 255, 255),
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.all(10),
+          content: Text(
+            'Added Succesfully',
+          )));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: Color.fromARGB(255, 255, 87, 58),
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.all(10),
+          content: Text(
+            'Fill all colums',
+          )));
+    }
+  }
+
+  updateStudent(String img, WidgetRef ref, int index, BuildContext context) {
+    final name = studentname.text.trim();
+    final age = studentAge.text.trim();
+    final batch = studentBatch.text.trim();
+    final regnum = studentRegNum.text.trim();
+    if (name.isNotEmpty &&
+        age.isNotEmpty &&
+        batch.isNotEmpty &&
+        regnum.isNotEmpty &&
+        img != '') {
+      final user = StudentModel(
+        name: name,
+        age: age,
+        batch: batch,
+        regnum: regnum,
+        image: img,
+      );
+
+      ref.read(studentProvider.notifier).updateStudent(user, index);
+
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: Color.fromARGB(255, 255, 255, 255),
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.all(10),
+          content: Text(
+            'Updated Succesfully',
+          )));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: Color.fromARGB(255, 255, 87, 58),
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.all(10),
+          content: Text(
+            'Failed to Update',
+          )));
+    }
   }
 }
