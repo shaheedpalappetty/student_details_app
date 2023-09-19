@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:getx_student_app/const/colors/colors.dart';
-import 'package:get/get.dart';
+
 import 'package:getx_student_app/views/add_student_screen.dart';
 import 'package:getx_student_app/views/student_details.dart';
 
@@ -30,7 +30,7 @@ class HomePage extends StatelessWidget {
               borderRadius: BorderRadiusDirectional.circular(4)),
           elevation: 0,
           onPressed: () {
-            Get.to(() => AddStudent());
+            
           },
           label: const Text(
             'Add Student',
@@ -105,7 +105,7 @@ class HomePage extends StatelessWidget {
                   ),
                   child: ListTile(
                     onTap: () {
-                      Get.to(() => const StudentDetails());
+                     
                     },
                     minVerticalPadding: 25,
                     leading: const CircleAvatar(

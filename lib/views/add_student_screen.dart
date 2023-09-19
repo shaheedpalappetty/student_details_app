@@ -1,7 +1,6 @@
 // ignore_for_file: dead_code
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:getx_student_app/const/colors/colors.dart';
 import 'package:getx_student_app/widgets/card_item.dart';
 import 'package:getx_student_app/widgets/custum_text_field.dart';
@@ -24,7 +23,7 @@ class AddStudent extends StatelessWidget {
         backgroundColor: Colors.transparent,
         leading: IconButton(
             onPressed: () {
-              Get.back();
+
             },
             icon: const Icon(Icons.arrow_back)),
         title: const Text('Add Student'),

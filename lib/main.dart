@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:getx_student_app/const/colors/colors.dart';
 import 'package:getx_student_app/views/home_page.dart';
-import 'package:get/get.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Student App with GetX',
       theme: ThemeData(
