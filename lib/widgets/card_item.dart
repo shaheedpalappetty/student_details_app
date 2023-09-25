@@ -14,39 +14,37 @@ class CardItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(
-            height: 5,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const SizedBox(
+          height: 5,
+        ),
+        Text(
+          title!,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade500,
+            letterSpacing: 4.0,
           ),
-          Text(
-            title!,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade500,
-              letterSpacing: 4.0,
-            ),
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+        Text(
+          value!,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade200,
           ),
-          const SizedBox(
-            height: 5,
-          ),
-          Text(
-            value!,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade200,
-            ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+      ],
     );
   }
 }
